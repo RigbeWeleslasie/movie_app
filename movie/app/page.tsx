@@ -2,11 +2,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Movie } from "@/app/utils/type";
+import { Movie } from "@/app/utils/movieDetails";
 import useFavorites from "@/app/hooks/useFavourites";
 import AppHeader from "./components/context/AppHeader";
 import MovieHeroDisplay from "./components/context/MovieHeroDisplay";
 import MovieList from "./components/context/MovieList";
+
 function LoadingState({ message = "Loading content..." }: { message?: string }) {
   return (
     <div className="flex items-center justify-center min-h-[50vh] bg-gray-100 dark:bg-gray-900">
@@ -26,8 +27,6 @@ function ErrorStateDisplay({ errorMessage }: { errorMessage: string | null }) {
     </div>
   );
 }
-
-
 export default function HomePage() {
   const [featuredMovie, setFeaturedMovie] = useState<Movie | undefined>(undefined);
   const [latestMovies, setLatestMovies] = useState<Movie[]>([]);

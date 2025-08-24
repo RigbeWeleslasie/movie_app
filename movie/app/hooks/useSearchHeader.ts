@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Movie } from "../utils/type";
+import { Movie } from "@/app/utils/movieDetails";
 import { searchMovies } from "../utils/fetchMovies";
 
 export default function useSearch(query: string) {

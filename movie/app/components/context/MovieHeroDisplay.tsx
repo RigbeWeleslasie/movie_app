@@ -1,65 +1,62 @@
-
 "use client";
-
-import { Movie } from "@/app/utils/type";
-
-interface MovieHeroDisplayProps { 
-  movie: Movie; 
-  onAddFavorite: (movie: Movie) => void;
-  isMovieFavorite: (id: number) => boolean; 
-}
-
-const DEFAULT_BACKDROP_PLACEHOLDER = "/images/default-backdrop.jpg"; 
-
-export default function MovieHeroDisplay({ movie, onAddFavorite, isMovieFavorite }: MovieHeroDisplayProps) {
-  if (!movie) {
-    return <div className="h-[70vh] flex items-center justify-center bg-gray-700 text-white">Loading hero...</div>;
-  }
-
-  const backdropUrl = movie.backdrop_path 
-    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
-    : DEFAULT_BACKDROP_PLACEHOLDER; 
-
-  const isCurrentlyFavorite = isMovieFavorite(movie.id); 
-  
-  let favoriteButton;
-  if (isCurrentlyFavorite) {
-    favoriteButton = (
-      <button 
-        disabled 
-        className="mt-5 px-6 py-3 w-auto sm:w-1/5 bg-gray-600 text-gray-300 rounded-lg cursor-not-allowed shadow-md text-sm sm:text-base"
-      >
-        Added to Favorites
-      </button>
-    );
-  } else {
-    favoriteButton = (
-      <button
-        onClick={() => onAddFavorite(movie)} 
-        className="mt-5 px-6 py-3 w-auto sm:w-1/5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-150 ease-in-out text-sm sm:text-base"
-      >
-        Add to Favorites
-      </button>
-    );
-  }
-
+import MovieList from "./MovieList";
+import { Movie } from "@/app/utils/movieDetails";
+const trendingMovie: Movie = {
+  id: 1,
+  title: "Inception",
+  overview: "A thief who steals corporate secrets through the use of dream-sharing technology is given the chance to erase his criminal history.",
+  poster_path: "/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg",
+  backdrop_path: "/s3TBrRGB1iav7gFOCNx3H31MoES.jpg",
+  release_date: "2010-07-16",
+  vote_average: 8.8,
+};
+const popularMovies: Movie[] = [
+  { id: 2, title: "Interstellar", poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" } as Movie,
+  { id: 3, title: "The Dark Knight", poster_path: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg" } as Movie,
+  { id: 4, title: "Avatar", poster_path: "/jRXYjXNq0Cs2TcJjLkki24MLp7u.jpg" } as Movie,
+];
+export default function HomePage() {
   return (
-    <section
-      className="relative h-[70vh] sm:h-[80vh] bg-cover bg-center text-white p-6 sm:p-10 flex flex-col justify-end sm:justify-center items-center sm:items-start text-center sm:text-left"
-      style={{ 
-        backgroundImage: backdropUrl ? `linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%), url(${backdropUrl})` : 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 100%)',
-        backgroundColor: (!backdropUrl && !movie.backdrop_path) ? '#2D3748' : undefined
-      }}
-    >
-      <div className="bg-black bg-opacity-30 p-4 rounded-md sm:bg-transparent sm:p-0"> 
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold mb-3 drop-shadow-lg">
-          {movie.title || "Movie Title"} 
-        </h1>
-        <p className="max-w-xl sm:max-w-3xl mb-6 text-base sm:text-lg lg:text-xl drop-shadow-md line-clamp-3 sm:line-clamp-none">
-          {movie.overview || "No overview."}
-        </p>
-        {favoriteButton}
-      </div>
-    </section>
+    <main className="bg-black min-h-screen text-white">
+      <section
+        className="relative h-[80vh] w-full flex items-center justify-start px-6 sm:px-12"
+        style={{
+          backgroundImage: `url(https://image.tmdb.org/t/p/original${trendingMovie.backdrop_path})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        <div className="relative z-10 max-w-2xl">
+          <h1 className="text-4xl sm:text-6xl font-extrabold mb-4 drop-shadow-lg">
+            {trendingMovie.title}
+          </h1>
+          <p className="text-base sm:text-lg mb-6 text-gray-200 line-clamp-3">
+            {trendingMovie.overview}
+          </p>
+          <div className="flex space-x-4">
+            <button className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-lg transition">
+              Show More
+            </button>
+          </div>
+        </div>
+      </section>
+      <section className="relative z-10 -mt-10 space-y-16 p-6 sm:p-12 text-black justify-center">
+        <MovieList movies={popularMovies} title="Popular Movies" />
+        <MovieList movies={popularMovies} title="Top Rated" />
+        <MovieList movies={popularMovies} title="Upcoming" />
+      </section>
+    </main>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
