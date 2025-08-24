@@ -28,13 +28,13 @@ function ErrorStateDisplay({ errorMessage }: { errorMessage: string | null }) {
 }
 
 
-export default function HomePage() { 
+export default function HomePage() {
   const [featuredMovie, setFeaturedMovie] = useState<Movie | undefined>(undefined);
   const [latestMovies, setLatestMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { addFavorite, removeFavorite, isFavorite } = useFavorites(); 
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     async function fetchPageData() {
@@ -49,8 +49,8 @@ export default function HomePage() {
           throw new Error("TMDB API key is not configured.");
         }
         const [featuredResponse, latestResponse] = await Promise.all([
-          fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US&page=1`), 
-          fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`)    
+          fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US&page=1`),
+          fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`)
         ]);
 
         if (!featuredResponse.ok) {
@@ -94,7 +94,7 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <>
-        <AppHeader /> 
+        <AppHeader />
         <LoadingState />
       </>
     );
@@ -111,14 +111,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <AppHeader />
-      
+
       <main>
         {featuredMovie ? (
-          <MovieHeroDisplay 
-            movie={featuredMovie} 
-            onAddFavorite={addFavorite} 
+          <MovieHeroDisplay
+            movie={featuredMovie}
+            onAddFavorite={addFavorite}
             onRemoveFavorite={removeFavorite}
-            isMovieFavorite={isFavorite} 
+            isMovieFavorite={isFavorite}
           />
         ) : (
           <div className="h-[70vh] flex items-center justify-center bg-gray-300 dark:bg-gray-700">

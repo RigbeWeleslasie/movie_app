@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import { Movie } from "../utils/type";
 import { fetchLatestMovies } from "../utils/fetchMovies";
