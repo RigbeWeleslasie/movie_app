@@ -2,22 +2,24 @@
 
 import useFavorites from "@/app/hooks/useFavourites";
 import MovieCard from "./MovieCard"; 
-import React from 'react'; 
+import React from 'react';
+
 
 export default function FavoritesList() {
-  const { favorites, removeFavorite, isFavorite, addFavorite } = useFavorites(); 
+  
+  const { favorites, removeFavorite, isFavorite } = useFavorites();
+
   const NoFavoritesMessage = (
-    <p className="text-center text-gray-500 dark:text-gray-400 mt-10 text-lg">
-      {"You haven't added any movies to your favorites yet."} 
-    </p>
+    <div className="text-center py-16 px-6">
+      <p className="text-xl sm:text-2xl text-gray-600 dark:text-gray-400 mb-6">
+        {"You haven't added any movies to your favorites yet."}
+      </p>
+     
+    </div>
   );
 
   if (!favorites || favorites.length === 0) {
-    return (
-      <div className="py-12"> 
-        {NoFavoritesMessage}
-      </div>
-    );
+    return NoFavoritesMessage;
   }
 
   return (
@@ -27,7 +29,7 @@ export default function FavoritesList() {
           key={movie.id}
           movie={movie}
           onRemoveFavorite={() => removeFavorite(movie.id)}
-          isFavorite={isFavorite(movie.id)} 
+          isFavorite={true} 
         />
       ))}
     </div>

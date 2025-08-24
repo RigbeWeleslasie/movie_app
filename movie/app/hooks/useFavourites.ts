@@ -1,63 +1,52 @@
+   
+    import { useState, useEffect, useCallback } from 'react';
+    import { Movie } from '@/app/utils/movieDetails'; 
 
-"use client";
+    const FAVORITES_KEY = 'movieFavorites';
 
-import { useState, useEffect } from "react";
-import { Movie } from "@/app/utils/movieDetails";
+    export default function useFavorites() {
+        const [favorites, setFavorites] = useState<Movie[]>([]);
 
-const FAVORITES_KEY = "myFavorites"; 
-
-export default function useFavorites() {
-  const [favorites, setFavorites] = useState<Movie[]>([]);
-
-
-  useEffect(() => {
-    const stored = localStorage.getItem(FAVORITES_KEY);
-    if (stored) {
-      try {
-        const parsedFavorites: Movie[] = JSON.parse(stored);
-     
-        if (Array.isArray(parsedFavorites)) {
-         
-          const uniqueFavoritesMap = new Map<number, Movie>();
-          parsedFavorites.forEach(movie => {
-            if (!uniqueFavoritesMap.has(movie.id)) {
-              uniqueFavoritesMap.set(movie.id, movie);
+        useEffect(() => {
+            try {
+                const storedFavorites = localStorage.getItem(FAVORITES_KEY);
+                if (storedFavorites) {
+                    setFavorites(JSON.parse(storedFavorites));
+                }
+            } catch (error) {
+                console.error("Error loading favorites from localStorage:", error);
             }
-          });
-          const uniqueFavoritesArray = Array.from(uniqueFavoritesMap.values());
-          setFavorites(uniqueFavoritesArray);
-        
+        }, []);
 
-        } else {
-          console.warn("Data in localStorage for favorites was not an array. Resetting.");
-          setFavorites([]);
-          localStorage.setItem(FAVORITES_KEY, JSON.stringify([]));
-        }
-      } catch (error) {
-        console.error("Failed to parse favorites from localStorage:", error);
-        setFavorites([]); 
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify([]));
-      }
+        const saveFavorites = useCallback((newFavorites: Movie[]) => {
+            try {
+                localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
+                setFavorites(newFavorites); 
+            } catch (error) {
+                console.error("Error saving favorites to localStorage:", error);
+            }
+        }, []);
+
+        const addFavorite = useCallback((movieToAdd: Movie) => {
+            if (favorites.find(fav => fav.id === movieToAdd.id)) {
+                console.log("Movie already in favorites:", movieToAdd.title);
+                return; 
+            }
+            const newFavorites = [...favorites, movieToAdd];
+            saveFavorites(newFavorites);
+            console.log("Added to favorites:", movieToAdd.title, newFavorites);
+        }, [favorites, saveFavorites]);
+
+        const removeFavorite = useCallback((idToRemove: number) => {
+            const newFavorites = favorites.filter(movie => movie.id !== idToRemove);
+            saveFavorites(newFavorites);
+            console.log("Removed from favorites, ID:", idToRemove, newFavorites);
+        }, [favorites, saveFavorites]);
+
+        const isFavorite = useCallback((idToCheck: number): boolean => {
+            return !!favorites.find(movie => movie.id === idToCheck);
+        }, [favorites]);
+
+        return { favorites, addFavorite, removeFavorite, isFavorite };
     }
-  }, []); 
-  const addFavorite = (movieToAdd: Movie) => {
-    if (favorites.some((favMovie) => favMovie.id === movieToAdd.id)) {
-      console.log(`Movie with ID ${movieToAdd.id} (${movieToAdd.title || 'Untitled'}) is already in favorites.`);
-      return; 
-    }
-    const updatedFavorites = [...favorites, movieToAdd];
-    setFavorites(updatedFavorites);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedFavorites));
-  };
-
-  const removeFavorite = (idToRemove: number) => {
-    const updatedFavorites = favorites.filter((movie) => movie.id !== idToRemove);
-    setFavorites(updatedFavorites);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedFavorites));
-  };
-  const isFavorite = (idToCheck: number): boolean => {
-    return favorites.some((movie) => movie.id === idToCheck);
-  };
-
-  return { favorites, addFavorite, removeFavorite, isFavorite };
-}
+    

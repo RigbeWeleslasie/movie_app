@@ -1,31 +1,36 @@
-// app/favorites/page.tsx
 "use client";
-
-import AppHeader from "@/app/components/context/AppHeader"; // Adjust path if necessary
-import MovieList from "@/app/components/context/MovieList";   // Adjust path if necessary
-import useFavorites from "@/app/hooks/useFavourites";
+import AppHeader from "@/app/components/context/AppHeader";
+import MovieList from "@/app/components/context/MovieList";
+import useFavorites from "@/app/hooks/useFavourites"; 
 import Link from "next/link";
 
-export default function FavoritesPage() {
-  const { favorites } = useFavorites(); // Get the current list of favorite movies
+
+export default function WishlistPage() { 
+  const { favorites } = useFavorites(); 
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <AppHeader />
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-gray-800 dark:text-gray-100">
-          My Favorite Movies
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-10 text-center text-gray-800 dark:text-gray-100">
+          My Wishlist 
         </h1>
 
-        {favorites.length > 0 ? (
-          <MovieList movies={favorites} title="" /> // Pass empty title or customize MovieList
+        {favorites && favorites.length > 0 ? (
+          <MovieList
+            movies={favorites}
+            title="" 
+          />
         ) : (
-          <div className="text-center py-10">
-            <p className="text-xl text-gray-500 dark:text-gray-400 mb-4">
-              You haven't added any movies to your favorites yet.
+          <div className="text-center py-16 px-6">
+            <p className="text-xl sm:text-2xl text-gray-600 dark:text-gray-400 mb-6">
+              {"You haven't added any movies to your wishlist yet."}
             </p>
-            <Link href="/" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-semibold transition">
-                Browse movies and find some favorites!
+            <Link
+              href="/"
+              className="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105"
+            >
+              Browse Movies
             </Link>
           </div>
         )}

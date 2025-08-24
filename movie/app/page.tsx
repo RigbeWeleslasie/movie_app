@@ -1,6 +1,5 @@
 
 "use client";
-
 import { useEffect, useState } from "react";
 import { Movie } from "@/app/utils/movieDetails";
 import useFavorites from "@/app/hooks/useFavourites";

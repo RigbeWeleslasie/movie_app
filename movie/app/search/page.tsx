@@ -1,31 +1,37 @@
 "use client";
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react'; 
 import { Movie } from "@/app/utils/movieDetails"; 
 import AppHeader from '../components/context/AppHeader'; 
 import MovieList from '../components/context/MovieList'; 
 
+
 function LoadingState() {
     return (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 dark:border-blue-400 mb-4"></div>
-            <p className="text-lg text-gray-600 dark:text-gray-300">Searching for movies...</p>
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400 mb-6"></div>
+            <p className="text-xl font-medium text-gray-700 dark:text-gray-300">Searching for cinematic treasures...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Please wait a moment.</p>
         </div>
     );
 }
+
 
 function ErrorState({ message }: { message: string }) {
     return (
-        <div className="text-center py-10 px-4">
-            <div className="bg-red-100 dark:bg-red-800 border border-red-300 dark:border-red-600 text-red-700 dark:text-red-200 p-6 rounded-lg shadow-md max-w-md mx-auto">
-                <h3 className="text-xl font-semibold mb-2">Search Error</h3>
-                <p>{message || "An unexpected error occurred."}</p>
-            </div>
+        <div className="flex flex-col items-center justify-center text-center py-16 px-6">
+            
+            <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-3">Oops! Something went wrong.</h3>
+            <p className="text-md text-gray-600 dark:text-gray-400 mb-8 max-w-md">
+                {message || "We couldn't complete your search. Please try again later."}
+            </p>
+           
         </div>
     );
 }
 
-export default function SearchResultsPage() {
+
+function SearchResultsComponent() {
     const searchParams = useSearchParams();
     const query = searchParams.get('query');
 
@@ -34,66 +40,69 @@ export default function SearchResultsPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (query && query.trim() !== "") { 
+        if (query && query.trim() !== "") {
+            const currentSearchQuery: string = query; 
             async function fetchSearchResults() {
                 setIsLoading(true);
                 setError(null);
-                setSearchResults([]); 
+                setSearchResults([]);
                 try {
                     const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY;
-                    if (!apiKey) {
-                        throw new Error("API key not configured. Please check environment variables.");
-                    }
+                    if (!apiKey) throw new Error("API key not configured.");
+                    
                     const response = await fetch(
-                        `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}&language=en-US&page=1&include_adult=false`
+                        `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(currentSearchQuery)}&language=en-US&page=1&include_adult=false`
                     );
 
                     if (!response.ok) {
-                        let errorMsg = `Search API request failed. Status: ${response.status}`;
+                        let errorMsg = `Search failed (Status: ${response.status})`;
                         try {
                             const errData = await response.json();
                             errorMsg = errData.status_message || errorMsg;
-                        } catch {  
-                         throw new Error(errorMsg);}
+                        } catch { 
+                        throw new Error(errorMsg);
+                        }
                     }
 
                     const data = await response.json();
-                    if (data.results && data.results.length > 0) {
-                        setSearchResults(data.results as Movie[]);
-                    } else {
-                        setSearchResults([]); 
-                    }
+                    setSearchResults(data.results as Movie[] || []);
                 } catch (err) {
                     console.error("Search fetch error:", err);
-                    setError(err instanceof Error ? err.message : "An unknown error occurred while fetching search results.");
+                    setError(err instanceof Error ? err.message : "An unknown error occurred.");
                 } finally {
                     setIsLoading(false);
                 }
             }
             fetchSearchResults();
         } else {
-           
             setSearchResults([]);
             setIsLoading(false);
             setError(null);
         }
     }, [query]);
 
-    const pageTitle = query ? (
-        <>
-            Results for <span className="text-blue-600 dark:text-blue-400">&quot;{query}&quot;</span>
-        </>
-    ) : (
-        "Search Movies"
-    );
-
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-slate-200 dark:from-gray-900 dark:to-slate-800 transition-colors duration-300">
             <AppHeader />
-            <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <h1 className="text-2xl sm:text-3xl font-semibold mb-8 text-gray-800 dark:text-gray-100">
-                    {pageTitle}
-                </h1>
+            <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+                <div className="mb-10 md:mb-14 text-center">
+                    {query && query.trim() !== "" ? (
+                        <>
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-800 dark:text-gray-100">
+                                Results for: <span className="text-blue-600 dark:text-blue-400">&quot;{query}&quot;</span>
+                            </h1>
+                            {searchResults.length > 0 && !isLoading && (
+                                <p className="mt-3 text-lg text-gray-600 dark:text-gray-400">
+                                    Found {searchResults.length} {searchResults.length === 1 ? 'movie' : 'movies'}.
+                                </p>
+                            )}
+                        </>
+                    ) : (
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-800 dark:text-gray-100">
+                            Search Our Movie Database
+                        </h1>
+                    )}
+                </div>
 
                 {isLoading && <LoadingState />}
                 {error && <ErrorState message={error} />}
@@ -101,19 +110,27 @@ export default function SearchResultsPage() {
                 {!isLoading && !error && (
                     <>
                         {searchResults.length === 0 && query && query.trim() !== "" && (
-                            <p className="text-center text-gray-500 dark:text-gray-400 mt-10 text-lg">
-                                {'No movies found for "'}
-                                <span className="font-semibold">{query}</span>
-                                {'". Try a different search term.'}
-                            </p>
+                            <div className="flex flex-col items-center justify-center text-center py-16 px-6 bg-white dark:bg-gray-800/50 rounded-xl shadow-lg">
+                               
+                                <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
+                                    No movies found for &quot;{query}&quot;
+                                </h3>
+                                <p className="text-md text-gray-600 dark:text-gray-400 max-w-md">
+                                    Try refining your search, checking for typos, or using different keywords.
+                                </p>
+                            </div>
                         )}
                         {searchResults.length === 0 && (!query || query.trim() === "") && (
-                            <p className="text-center text-gray-500 dark:text-gray-400 mt-10 text-lg">
-                                Please enter a search term in the header to find movies.
-                            </p>
+                            <div className="flex flex-col items-center justify-center text-center py-20 px-6">
+                                
+                                <h3 className="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-3">Start Your Search</h3>
+                                <p className="text-md text-gray-500 dark:text-gray-400 max-w-md">
+                                    Use the search bar in the header to find specific movies by title.
+                                </p>
+                            </div>
                         )}
                         {searchResults.length > 0 && (
-                            <MovieList movies={searchResults} title={`Search Results (${searchResults.length})`} />
+                            <MovieList movies={searchResults} title="" /> 
                         )}
                     </>
                 )}
@@ -121,3 +138,15 @@ export default function SearchResultsPage() {
         </div>
     );
 }
+export default function SearchResultsPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-gray-100 to-slate-200 dark:from-gray-900 dark:to-slate-800 flex items-center justify-center">
+                <LoadingState /> 
+            </div>
+        }>
+            <SearchResultsComponent />
+        </Suspense>
+    );
+}
+
