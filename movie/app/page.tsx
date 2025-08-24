@@ -42,13 +42,13 @@ export default function HomePage() {
       setLatestMovies([]);
 
       try {
-        const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY;
-        if (!apiKey) {
+        const NEXT_PUBLIC_TMDB_API_KEY= process.env.NEXT_PUBLIC_TMDB_API_KEY;
+        if (!NEXT_PUBLIC_TMDB_API_KEY) {
           throw new Error("TMDB API key is not configured.");
         }
         const [featuredResponse, latestResponse] = await Promise.all([
-          fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US&page=1`),
-          fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`)
+          fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&page=1`),
+          fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&page=1`)
         ]);
 
         if (!featuredResponse.ok) {
