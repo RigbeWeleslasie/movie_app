@@ -1,6 +1,6 @@
 
 "use client";
-const api_key= process.env.NEXT_PUBLIC_TMDB_API_KEY;
+
 import { useEffect, useState } from "react";
 import { Movie } from "@/app/utils/movieDetails";
 import useFavorites from "@/app/hooks/useFavourites";
@@ -43,13 +43,13 @@ export default function HomePage() {
       setLatestMovies([]);
 
       try {
-      
-        if (!api_key) {
+        const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+        if (!apiKey) {
           throw new Error("TMDB API key is not configured.");
         }
         const [featuredResponse, latestResponse] = await Promise.all([
-          fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${api_key}&language=en-US&page=1`),
-          fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${api_key}&language=en-US&page=1`)
+          fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US&page=1`),
+          fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`)
         ]);
 
         if (!featuredResponse.ok) {

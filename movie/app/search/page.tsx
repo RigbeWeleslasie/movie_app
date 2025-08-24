@@ -1,5 +1,4 @@
 "use client";
-const api_key= process.env.NEXT_PUBLIC_TMDB_API_KEY;
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react'; 
 import { Movie } from "@/app/utils/movieDetails"; 
@@ -16,6 +15,8 @@ function LoadingState() {
         </div>
     );
 }
+
+
 function ErrorState({ message }: { message: string }) {
     return (
         <div className="flex flex-col items-center justify-center text-center py-16 px-6">
@@ -46,11 +47,11 @@ function SearchResultsComponent() {
                 setError(null);
                 setSearchResults([]);
                 try {
-                  
-                    if (!api_key) throw new Error("API key not configured.");
+                    const NEXT_PUBLIC_TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+                    if (!NEXT_PUBLIC_TMDB_API_KEY) throw new Error("API key not configured.");
                     
                     const response = await fetch(
-                        `https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${encodeURIComponent(currentSearchQuery)}&language=en-US&page=1&include_adult=false`
+                        `https://api.themoviedb.org/3/search/movie?api_key=${NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(currentSearchQuery)}&language=en-US&page=1&include_adult=false`
                     );
 
                     if (!response.ok) {
